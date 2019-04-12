@@ -8,3 +8,8 @@ Hands on tutorial for SlicerIGT at CARS 2019. SlicerIGT home page: http://www.sl
 - Rebecca: make setup script that installs Jupyter too
 - Tamas: Write jupyter notebook for training
 - David: Build custom module that logs events in csv file
+
+## Useful info
+
+Rebecca's ImageClassification repository: https://github.com/RebeccaHisey/ImageClassification
+

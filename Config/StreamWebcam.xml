@@ -1,0 +1,46 @@
+<PlusConfiguration version="2.0">
+
+  <DataCollection StartupDelaySec="1.0" >
+    <DeviceSet
+      Name="Windows Media Foundation video - color"
+      Description="Broadcasting acquired video through OpenIGTLink" />
+    <Device
+      Id="VideoDevice"
+      Type="MmfVideo"
+      FrameSize="640 480"
+      VideoFormat="RGB24"
+      CaptureDeviceId="0" >
+      <DataSources>
+        <DataSource Type="Video" Id="Video" PortUsImageOrientation="UF" ImageType="RGB_COLOR"  />
+      </DataSources>
+      <OutputChannels>
+        <OutputChannel Id="VideoStream" VideoDataSourceId="Video" />
+      </OutputChannels>
+    </Device>
+  </DataCollection>
+
+  <PlusOpenIGTLinkServer
+    MaxNumberOfIgtlMessagesToSend="1"
+    MaxTimeSpentWithProcessingMs="50"
+    ListeningPort="18944"
+    OutputChannelId="VideoStream" >
+    <DefaultClientInfo>
+      <MessageTypes>
+        <Message Type="VIDEO" />
+      </MessageTypes>
+      <VideoNames>
+        <Video Name="Video" EmbeddedTransformToFrame="Video">
+          <Encoding 
+            FourCC="VP90"
+            Lossless ="FALSE"
+            Speed="8"
+            DeadlineMode="REALTIME"
+            RateControl="Q"
+            TargetBitrate="16"
+            />
+        </Video>
+      </VideoNames>
+    </DefaultClientInfo>
+  </PlusOpenIGTLinkServer>
+
+</PlusConfiguration>

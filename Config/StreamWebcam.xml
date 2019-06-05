@@ -9,7 +9,8 @@
       Type="MmfVideo"
       FrameSize="640 480"
       VideoFormat="RGB24"
-      CaptureDeviceId="0" >
+      CaptureDeviceId="0"
+      AcquisitionRate="10">
       <DataSources>
         <DataSource Type="Video" Id="Video" PortUsImageOrientation="UF" ImageType="RGB_COLOR"  />
       </DataSources>

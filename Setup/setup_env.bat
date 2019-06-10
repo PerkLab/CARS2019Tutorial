@@ -8,16 +8,16 @@ set EnvironmentPath=%1
 
 :: Create the environment and activate it
 
-call conda create -y -n %EnvironmentPath% tensorflow-gpu
+call conda create -y -p %EnvironmentPath% tensorflow-gpu
 call activate %EnvironmentPath%
 
 :: Install additional packages
 
-call conda install -y keras==2.2.4 pandas==0.24.2 opencv==3.4.2 jupyter git==2.20.1
+call conda install -y keras pandas opencv==3.4.2 jupyter git scikit-learn matplotlib Pillow ipywidgets
 
-:: Install pyIGTLink from source
+:: Install pyIGTLink from sourceopen
 
-call git clone -b pyIGTLink_client https://github.com/Sunderlandkyl/pyIGTLink.git %ProjectPath%\pyIGTLink
+call git clone -b pyIGTLink_client https://github.com/SlicerIGT/pyIGTLink.git %ProjectPath%\pyIGTLink
 call pip install -e %ProjectPath%\pyIGTLink
 
 :: Install keras-vis from source

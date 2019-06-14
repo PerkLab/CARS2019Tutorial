@@ -4,7 +4,9 @@
 if %1.==. goto No1
 
 set CurrentPath=%cd%
+set CurrentDrive=%CD:~0,2%
 set EnvironmentPath=%1
+set EnvironmentDrive=%~d1
 
 :: Create the environment and activate it
 
@@ -22,12 +24,14 @@ call pip install -e %ProjectPath%\pyIGTLink
 
 :: Install keras-vis from source
 
+%EnvironmentDrive%
 cd %EnvironmentPath%
 
 call git clone https://github.com/raghakot/keras-vis.git %EnvironmentPath%\keras-vis
 cd keras-vis
 call python setup.py install
 
+%CurrentDrive%
 cd %CurrentPath%
 
 

@@ -48,9 +48,12 @@ class CarsModuleWidget(ScriptedLoadableModuleWidget):
     
     ScriptedLoadableModuleWidget.setup(self)
     
+    self.detectionOn = False
+    
     self.updateTimer = qt.QTimer()
     self.updateTimer.setInterval(100)
     self.updateTimer.setSingleShot(True)
+    self.updateTimer.connect('timeout()', self.onUpdateTimer)
 
     # Instantiate and connect widgets ...
 
@@ -96,7 +99,7 @@ class CarsModuleWidget(ScriptedLoadableModuleWidget):
     #
     # Apply Button
     #
-    self.applyButton = qt.QPushButton("Apply")
+    self.applyButton = qt.QPushButton("Start detection")
     self.applyButton.toolTip = "Run the algorithm."
     self.applyButton.enabled = True
     parametersFormLayout.addRow(self.applyButton)
@@ -115,14 +118,26 @@ class CarsModuleWidget(ScriptedLoadableModuleWidget):
 
 
   def onUpdateTimer(self):
-    newText = self.logic.getLastClass()
-    self.classLabel.setText(newText)
-    self.updateTimer.start()
+    if self.detectionOn:
+      newText = self.logic.getLastClass()
+      self.classLabel.setText(newText)
+      self.updateTimer.start()
+    else:
+      self.classLabel.setText("")
     
 
   def cleanup(self):
     pass
-
+  
+  
+  def setDetection(self, currentState):
+    self.detectionOn = currentState
+    if self.detectionOn is True:
+      self.applyButton.setText("Stop detection")
+    else:
+      self.applyButton.setText("Start detection")
+  
+  
   def onApplyButton(self):
     imageThreshold = self.imageThresholdSliderWidget.value
     modelFilePath = self.modelPathEdit.currentPath
@@ -132,20 +147,27 @@ class CarsModuleWidget(ScriptedLoadableModuleWidget):
     success = self.logic.loadKerasModel(modelFilePath)
     if not success:
       logging.error("Failed to load Keras model: {}".format(modelFilePath))
+      self.setDetection(False)
       return
     
     inputVolumeNode = self.inputSelector.currentNode()
     if inputVolumeNode is None:
       logging.error("Please select a valid image node!")
+      self.setDetection(False)
       return
     
     success = self.logic.run(inputVolumeNode, imageThreshold)
     if not success:
       logging.error("Could not start classification!")
+      self.setDetection(False)
       return
     
-    self.updateTimer.connect('timeout()', self.onUpdateTimer)
-    self.updateTimer.start()
+    if self.detectionOn is True:
+      self.setDetection(False)
+      return
+    else:
+      self.setDetection(True)
+      self.updateTimer.start()
     
 
 #
@@ -169,6 +191,7 @@ class CarsModuleLogic(ScriptedLoadableModuleLogic):
     self.lastClass = ""
     self.model_input_size = None
     self.classes = ['A', 'C', 'None', 'R', 'S']
+    self.predictionThreshold = 0.0
 
   
   def getLastClass(self):
@@ -226,7 +249,9 @@ class CarsModuleLogic(ScriptedLoadableModuleLogic):
     if self.model is None:
       logging.error('Cannot run classification without model!')
       return False
-
+    
+    self.predictionThreshold = imageThreshold
+    
     image = inputVolumeNode.GetImageData()
     shape = list(image.GetDimensions())
     shape.reverse()
@@ -272,9 +297,14 @@ class CarsModuleLogic(ScriptedLoadableModuleLogic):
     
     prediction = self.model.predict(resized_input_array)
     maxPredictionIndex = prediction.argmax()
-    self.lastClass = self.classes[maxPredictionIndex]
+    maxPrediction = prediction[0, maxPredictionIndex]
     
-    print("Prediction: {} at {:2.2%} probability".format(self.lastClass, prediction[0, maxPredictionIndex]))
+    if maxPrediction > self.predictionThreshold:
+      self.lastClass = self.classes[maxPredictionIndex]
+    else:
+      self.lastClass = "None"
+    
+    print("Prediction: {} at {:2.2%} probability".format(self.lastClass, maxPrediction))
     
 
 class CarsModuleTest(ScriptedLoadableModuleTest):

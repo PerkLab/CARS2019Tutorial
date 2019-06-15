@@ -7,10 +7,10 @@
     <Device
       Id="VideoDevice"
       Type="MmfVideo"
-      FrameSize="640 480"
+      FrameSize="320 240"
       VideoFormat="RGB24"
       CaptureDeviceId="0"
-      AcquisitionRate="10">
+      AcquisitionRate="15">
       <DataSources>
         <DataSource Type="Video" Id="Video" PortUsImageOrientation="UF" ImageType="RGB_COLOR"  />
       </DataSources>
@@ -34,10 +34,10 @@
           <Encoding 
             FourCC="VP90"
             Lossless ="FALSE"
-            Speed="8"
+            Speed="6"
             DeadlineMode="REALTIME"
             RateControl="Q"
-            TargetBitrate="16"
+            TargetBitrate="500"
             />
         </Video>
       </VideoNames>
